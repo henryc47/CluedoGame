@@ -15,7 +15,7 @@ tiles = ['wall','walk','kitchen','dining_room','lounge','hall','study','library'
 'start_scarlet','start_plum','start_peacock','start_rev_green','start_white','secret_study','secret_lounge','secret_conservatory','secret_kitchen',
 'centre']
 
-#load the sprites we are using in this game
+#load the static sprites we are using in this game
 class StaticSprites():
     def __init__(self):
         self.walk = pygame.image.load("cluedo_images/walk.png")
@@ -24,13 +24,15 @@ class StaticSprites():
         self.space = pygame.image.load("cluedo_images/space.png")
         self.secret = pygame.image.load("cluedo_images/secret.png")
 
-#controls the overall flow of the game
-class GameMaster():
-    #setup the game
+#load the dynamic sprites we are using in this game
+class DynamicSprites():
     def __init__(self):
-        pygame.init()  # initialize pygame
-        clock = pygame.time.Clock()
-        screen = pygame.display.set_mode((600, 480))
+        self.mustard = pygame.image.load("cluedo_images/mustard.png")
+        self.scarlet = pygame.image.load("cluedo_images/scarlet.png")
+        self.peacock = pygame.image.load("cluedo_images/peacock.png")
+        self.rev_green = pygame.image.load("cluedo_images/rev_green.png")
+        self.plum = pygame.image.load("cluedo_images/plum.png")
+        self.peacock = pygame.image.load("cluedo_images/peacock.png")
 
 
 #cludeo is played on a 27 tile wide,25 tile tall board
@@ -47,6 +49,7 @@ class Board():
         self.board_pixel_width = self.tile_width*self.board_width
         self.board_pixel_height = self.tile_height*self.board_height
         self.static_sprites = StaticSprites() #load the static sprites used in the game
+        self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
         self.render_board()
     
     #convert the raw data about the board from a csv file to a numpy array
@@ -95,14 +98,35 @@ class Board():
 
             y = y+1 #moving down to the next row
 
+    def print_position_attribute(x,y):
+        pass
 
+#controls the overall flow of the game logic
+def GameMaster():
+    def __init__(self,board_path='board.csv',tile_list=tiles):
+       board_values,board_size =  self.extract_board_data(board_path,tiles)
+        
+
+
+    #extract info about the board
+    def extract_board_data(board_path,tiles):
+        board_raw = pandas.read_csv(board_path,header=None) #extract raw data from the csv file
+        board_size = board_raw.shape #get the dimensions of the board
+        board_values = np.zeros(board_size)#the board represented as a numpy array, the numbers represent what type of tile occupies each grid-square
+        for i,tile_name in enumerate(tiles): #go through all the types of tiles
+            truth = board_raw==tile_name #find the tiles which are the current type of tile
+            board_values = board_values + truth*i #set the tile number accordingly
+
+        board_values = np.array(board_values,dtype=int) #convert back to a numpy array of ints
+        return board_values,board_size #provide the numeric representation of the boards tiles
 
 
         
 def main():
     pygame.init()  # initialize pygame
-    clock = pygame.time.Clock()
-    screen = pygame.display.set_mode((864,832)) #the game window will be 800 pixels wide, 450 pixels tall
+    resized_flag = False
+    clock = pygame.time.Clock() #create a clock to set the frame-rate
+    screen = pygame.display.set_mode((864,832),pygame.RESIZABLE)
     pygame.mouse.set_visible(1)
     pygame.display.set_caption('Cluedo') #display the game title in the window
     board = Board("board.csv") #create the board
@@ -110,12 +134,19 @@ def main():
     while True:
         clock.tick(60)
         #bg = pygame.image.load("rock.jpeg")
-        screen.blit(board.static_board_surface, (0, 0))
+        display = board.static_board_surface
+        if resized_flag==False:
+            screen.blit(display, (0, 0))
+        elif resized_flag==True:
+            screen.blit(pygame.transform.scale(display,resized),(0,0))
         x, y = pygame.mouse.get_pos() #get pixel position of mouse
-        #print("x = ",x," y = ",y) #display pixel position of mouse
+        print("x = ",x," y = ",y) #display pixel position of mouse
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
+            elif event.type == pygame.VIDEORESIZE:
+                resized_flag = True
+                resized = event.dict['size']
         pygame.display.update()
 
 if __name__ == '__main__':
