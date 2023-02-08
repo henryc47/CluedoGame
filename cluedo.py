@@ -38,30 +38,17 @@ class DynamicSprites():
 #cludeo is played on a 27 tile wide,25 tile tall board
 class Board():
     #create the board on which the game will be played
-    def __init__(self,board_path):
-        board_raw = pandas.read_csv(board_path,header=None) #extract raw data from the csv file
-        self.board_static,board_size = self.board_extract(board_raw) #extract the tiles that make up the board as a numpy array
-        self.tile_width = 32 #constant, x size
-        self.tile_height = 32 #constant, y size
-        self.board_width = board_size[1]
-        self.board_height = board_size[0]
-        print('board width = ',self.board_width,' board_height = ',self.board_height)
-        self.board_pixel_width = self.tile_width*self.board_width
-        self.board_pixel_height = self.tile_height*self.board_height
+    def __init__(self,board_values,board_width,board_height,tile_size):
+        self.board_values = board_values
+        self.board_width = board_width
+        self.board_height = board_height
+        self.tile_size = tile_size
+        self.board_pixel_width = self.tile_size*self.board_width
+        self.board_pixel_height = self.tile_size*self.board_height
         self.static_sprites = StaticSprites() #load the static sprites used in the game
         self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
         self.render_board()
     
-    #convert the raw data about the board from a csv file to a numpy array
-    def board_extract(self,board_raw):
-        board_size = board_raw.shape #get the dimensions of the board
-        board_values = np.zeros(board_size)#the board represented as a numpy array, the numbers represent what type of tile occupies each grid-square
-        for i,tile_name in enumerate(tiles): #go through all the types of tiles
-            truth = board_raw==tile_name #find the tiles which are the current type of tile
-            board_values = board_values + truth*i #set the tile number accordingly
-        
-        board_values = np.array(board_values) #convert back to a numpy array
-        return board_values,board_size #provide the numeric representation of the boards tiles
             
     def render_board(self):
         self.render_static_tiles()
@@ -73,11 +60,11 @@ class Board():
         y = 0 #position of current tile in the board along the y-axis
         self.static_board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
         #self.static_board_surface.set_colourkey((0,0,0)) #background is black
-        for row in self.board_static:
+        for row in self.board_values:
             x = 0 #reset x position each row
             for tile in row:
-                x_position = x*self.tile_width
-                y_position = y*self.tile_height
+                x_position = x*self.tile_size
+                y_position = y*self.tile_size
                 tile_text = tiles[int(tile)] #get the text of the tile
                 #select image based on what type of tile we are using
                 if tile_text=='wall':
@@ -102,14 +89,43 @@ class Board():
         pass
 
 #controls the overall flow of the game logic
-def GameMaster():
+class GameMaster():
     def __init__(self,board_path='board.csv',tile_list=tiles):
-       board_values,board_size =  self.extract_board_data(board_path,tiles)
-        
+        board_values,board_size =  self.extract_board_data(board_path,tiles)
+        board_height = board_size[0] #height of the board in tiles
+        board_width = board_size[1] #width of the board in tiles
+        self.tile_size = 32 #number of pixels in a tile
+        self.board_height_pixels = board_height*self.tile_size #height of the playing board in pixels
+        self.board_width_pixels = board_height*self.tile_size #width of the playing board in pixels
+        self.other_player_width_pixels = 258 #width of the left sidebar, where players and their cards are displayed
+        self.self_player_width_pixels = 258 #width of the right sidebar, where your own cards and controls are displayed
+        self.screen_default_width = self.board_width_pixels + self.other_player_width_pixels + self.self_player_width_pixels #total width, pixels,s of the screen
+        self.screen_default_height = self.board_height_pixels #total height, pixels, of the screen
+        self.display = pygame.display.set_mode((self.screen_default_width,self.screen_default_height),pygame.RESIZABLE) #create the display on which the screen is projected
+        self.display_resized_flag = False
+        self.screen =  pygame.Surface((self.screen_default_width,self.screen_default_height)) #screen object on which UI elements are project
+        #create the board object
+        self.board = Board(board_values,board_height,board_width,self.tile_size) #create the board object           
 
+
+
+    #resize the screen
+    def display_resize(self,new_size):
+        self.display_resized_flag = True
+        self.new_size = new_size
+
+    #display the contents of the screen on the display
+    def display_render(self):
+        #project UI elements on the screen
+        self.screen.blit(self.board.static_board_surface,(self.other_player_width_pixels,0)) #project the board onto the screen
+        #project the screen onto the final display accounting for dynamic resizing
+        if self.display_resized_flag==False:
+            self.display.blit(self.screen, (0, 0))
+        elif self.display_resized_flag==True:
+            self.display.blit(pygame.transform.scale(self.screen,self.new_size),(0,0))
 
     #extract info about the board
-    def extract_board_data(board_path,tiles):
+    def extract_board_data(self,board_path,tiles):
         board_raw = pandas.read_csv(board_path,header=None) #extract raw data from the csv file
         board_size = board_raw.shape #get the dimensions of the board
         board_values = np.zeros(board_size)#the board represented as a numpy array, the numbers represent what type of tile occupies each grid-square
@@ -120,33 +136,27 @@ def GameMaster():
         board_values = np.array(board_values,dtype=int) #convert back to a numpy array of ints
         return board_values,board_size #provide the numeric representation of the boards tiles
 
-
+    
         
 def main():
     pygame.init()  # initialize pygame
-    resized_flag = False
     clock = pygame.time.Clock() #create a clock to set the frame-rate
-    screen = pygame.display.set_mode((864,832),pygame.RESIZABLE)
-    pygame.mouse.set_visible(1)
     pygame.display.set_caption('Cluedo') #display the game title in the window
-    board = Board("board.csv") #create the board
-    print(board.board_static)
+    #board = Board("board.csv") #create the board
+    #print(board.board_static)
+    gm = GameMaster()
     while True:
         clock.tick(60)
         #bg = pygame.image.load("rock.jpeg")
-        display = board.static_board_surface
-        if resized_flag==False:
-            screen.blit(display, (0, 0))
-        elif resized_flag==True:
-            screen.blit(pygame.transform.scale(display,resized),(0,0))
+        gm.display_render()
         x, y = pygame.mouse.get_pos() #get pixel position of mouse
         print("x = ",x," y = ",y) #display pixel position of mouse
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
             elif event.type == pygame.VIDEORESIZE:
-                resized_flag = True
-                resized = event.dict['size']
+                new_size = event.dict['size']
+                gm.display_resize(new_size)
         pygame.display.update()
 
 if __name__ == '__main__':
