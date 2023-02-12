@@ -102,17 +102,27 @@ class GameMaster():
         self.screen_default_width = self.board_width_pixels + self.other_player_width_pixels + self.self_player_width_pixels #total width, pixels,s of the screen
         self.screen_default_height = self.board_height_pixels #total height, pixels, of the screen
         self.display = pygame.display.set_mode((self.screen_default_width,self.screen_default_height),pygame.RESIZABLE) #create the display on which the screen is projected
-        self.display_resized_flag = False
+        self.display_resized_flag = False #the display has not yet been resized
+        self.display_width = self.screen_default_width #display width
+        self.display_height = self.screen_default_height #display height
         self.screen =  pygame.Surface((self.screen_default_width,self.screen_default_height)) #screen object on which UI elements are project
         #create the board object
         self.board = Board(board_values,board_height,board_width,self.tile_size) #create the board object           
 
 
-
     #resize the screen
     def display_resize(self,new_size):
-        self.display_resized_flag = True
-        self.new_size = new_size
+        self.display_resized_flag = True #indicate the display has been resized
+        self.new_size = new_size #store the new size of the display
+        self.display_width = new_size[0] #update display width
+        self.display_height = new_size[1] #update display height
+
+    def screen_mouse_position(self,x,y):
+        #convert mouse position between display coordinates and screen coordinates
+        screen_x = x*(self.screen_default_width/self.display_width) #position on the screen
+        screen_y = y*(self.screen_default_height/self.display_height) #position on the screen
+        return screen_x,screen_y
+
 
     #display the contents of the screen on the display
     def display_render(self):
@@ -150,7 +160,6 @@ def main():
         #bg = pygame.image.load("rock.jpeg")
         gm.display_render()
         x, y = pygame.mouse.get_pos() #get pixel position of mouse
-        print("x = ",x," y = ",y) #display pixel position of mouse
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
