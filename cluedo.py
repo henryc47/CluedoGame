@@ -87,16 +87,24 @@ class Board():
             y = y+1 #moving down to the next row
 
     def mouse_down(self,x,y,debug):
-        tile_x,tile_y = self.pixel_position_to_tile(x,y)
+        tile_x,tile_y = self.pixel_position_to_tile(x,y) #determine the position of the clicked on tile
         if debug==True:
             print('tile x = ',tile_x,' tile y =',tile_y)
-
+        tile_type = self.extract_tile_type(tile_x,tile_y) #determine the type of tile we clicked on
+        if debug==True:
+            print('this is a ',tile_type,' tile')
     
     #convert pixel position on the board to tile position
     def pixel_position_to_tile(self,x,y):
         tile_position_x = int(x/self.tile_size)
         tile_position_y = int(y/self.tile_size)
         return tile_position_x,tile_position_y
+
+    #provide the type of tile at a particular position
+    def extract_tile_type(self,tile_x,tile_y):
+        tile_value = self.board_values[tile_y,tile_x]
+        tile_type = tiles[tile_value]
+        return tile_type
 
 
 
