@@ -28,7 +28,7 @@ class StaticSprites():
         self.secret = pygame.image.load("cluedo_images/secret.png")
 
 #load the dynamic sprites we are using in this game
-class DynamicSprites():
+class PlayerSprites():
     def __init__(self):
         self.mustard = pygame.image.load("cluedo_images/mustard.png").convert_alpha()
         self.scarlet = pygame.image.load("cluedo_images/scarlet.png").convert_alpha()
@@ -58,7 +58,7 @@ class Board():
     def setup_rendering(self):
         self.board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
         self.static_sprites = StaticSprites() #load the static sprites used in the game
-        self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
+        self.dynamic_sprites = PlayerSprites() #load the dynamic sprites used in the game
         self.render_static_tiles() #create the background
         
     #render the current board        
@@ -146,7 +146,7 @@ class Board():
                 elif tile_text=='start_peacock':
                     player='peacock'
                 elif tile_text=='start_rev_green':
-                    player='green'
+                    player='rev_green'
                 elif tile_text=='start_white':
                     player='white'
                 else:
