@@ -11,9 +11,12 @@ import sys
 import os
 
 #constants
+#list of all static objects
 tiles = ['wall','walk','kitchen','dining_room','lounge','hall','study','library','billards','conservatory','ballroom','start_mustard',
 'start_scarlet','start_plum','start_peacock','start_rev_green','start_white','secret_study','secret_lounge','secret_conservatory','secret_kitchen',
 'centre']
+#list of all players
+players = ['mustard','scarlet','plum','peacock','rev_green','white']
 
 #load the static sprites we are using in this game
 class StaticSprites():
@@ -40,7 +43,7 @@ class Board():
     #create the board on which the game will be played
     def __init__(self,board_values,board_width,board_height,tile_size):
         self.name = 'board' #name of the object, for debugging purposes
-        self.board_values = board_values
+        self.board_values = board_values #numbers what type of static object each position holds
         self.board_width = board_width
         self.board_height = board_height
         self.tile_size = tile_size
@@ -48,15 +51,15 @@ class Board():
         self.board_pixel_height = self.tile_size*self.board_height
         self.static_sprites = StaticSprites() #load the static sprites used in the game
         self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
+        self.create_players_at_start()
         self.render_board()
     
             
     def render_board(self):
         self.render_static_tiles()
 
+    #render the static objects that make up the board
     def render_static_tiles(self):
-        start_x = 0 #where does the board display start, x pixels
-        start_y = 0 #where does the static section start, y pixels
         x = 0 #position of current tile in the board along the x-axis
         y = 0 #position of current tile in the board along the y-axis
         self.static_board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
@@ -86,6 +89,34 @@ class Board():
 
             y = y+1 #moving down to the next row
 
+    #create the map of players at their starting positions
+    def create_players_at_start(self):
+        self.player_map = []
+        for row in self.board_values:
+            new_row = []
+            for tile in row:
+                tile_text = tiles[tile] #get the text of the tile
+                if tile_text=='start_mustard':
+                    player='mustard'
+                elif tile_text=='start_scarlet':
+                    player='scarlet'
+                elif tile_text=='start_plum':
+                    player='plum'
+                elif tile_text=='start_peacock':
+                    player='peacock'
+                elif tile_text=='start_rev_green':
+                    player='green'
+                elif tile_text=='start_white':
+                    player='white'
+                else:
+                    player=' ' #placeholder
+                new_row.append(player)
+            self.player_map.append(new_row)
+                
+
+                
+
+
     def mouse_down(self,x,y,debug):
         tile_x,tile_y = self.pixel_position_to_tile(x,y) #determine the position of the clicked on tile
         if debug==True:
@@ -93,6 +124,7 @@ class Board():
         tile_type = self.extract_tile_type(tile_x,tile_y) #determine the type of tile we clicked on
         if debug==True:
             print('this is a ',tile_type,' tile')
+        
     
     #convert pixel position on the board to tile position
     def pixel_position_to_tile(self,x,y):
@@ -105,8 +137,6 @@ class Board():
         tile_value = self.board_values[tile_y,tile_x]
         tile_type = tiles[tile_value]
         return tile_type
-
-
 
 #controls the overall flow of the game logic
 class GameMaster():
@@ -210,13 +240,6 @@ class GameMaster():
             object_clicked = -1
 
         return object_x,object_y,object_clicked
-
-
-
-        
-        
-
-
 
     #handler for the mouse down event
     def mouse_down(self,event):
