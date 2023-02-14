@@ -30,12 +30,12 @@ class StaticSprites():
 #load the dynamic sprites we are using in this game
 class DynamicSprites():
     def __init__(self):
-        self.mustard = pygame.image.load("cluedo_images/mustard.png")
-        self.scarlet = pygame.image.load("cluedo_images/scarlet.png")
-        self.peacock = pygame.image.load("cluedo_images/peacock.png")
-        self.rev_green = pygame.image.load("cluedo_images/rev_green.png")
-        self.plum = pygame.image.load("cluedo_images/plum.png")
-        self.peacock = pygame.image.load("cluedo_images/peacock.png")
+        self.mustard = pygame.image.load("cluedo_images/mustard.png").convert_alpha()
+        self.scarlet = pygame.image.load("cluedo_images/scarlet.png").convert_alpha()
+        self.peacock = pygame.image.load("cluedo_images/peacock.png").convert_alpha()
+        self.rev_green = pygame.image.load("cluedo_images/rev_green.png").convert_alpha()
+        self.plum = pygame.image.load("cluedo_images/plum.png").convert_alpha()
+        self.white = pygame.image.load("cluedo_images/white.png").convert_alpha()
 
 
 #cludeo is played on a 27 tile wide,25 tile tall board
@@ -47,22 +47,30 @@ class Board():
         self.board_width = board_width
         self.board_height = board_height
         self.tile_size = tile_size
-        self.board_pixel_width = self.tile_size*self.board_width
-        self.board_pixel_height = self.tile_size*self.board_height
-        self.static_sprites = StaticSprites() #load the static sprites used in the game
-        self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
+        self.board_pixel_width = self.tile_size*self.board_width #determine the default width in pixels of the board
+        self.board_pixel_height = self.tile_size*self.board_height #determine the default height in pixels of the board
+
         self.create_players_at_start()
+        self.setup_rendering()
         self.render_board()
     
-            
+    #create the objects involved in rendering the board, and render the static background
+    def setup_rendering(self):
+        self.board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
+        self.static_sprites = StaticSprites() #load the static sprites used in the game
+        self.dynamic_sprites = DynamicSprites() #load the dynamic sprites used in the game
+        self.render_static_tiles() #create the background
+        
+    #render the current board        
     def render_board(self):
-        self.render_static_tiles()
+        self.board_surface.blit(self.static_board_surface,(0,0)) #render the background onto the main surface
+        self.render_players() #render the players onto the background
 
     #render the static objects that make up the board
     def render_static_tiles(self):
         x = 0 #position of current tile in the board along the x-axis
         y = 0 #position of current tile in the board along the y-axis
-        self.static_board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
+        self.static_board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size to be the background
         #self.static_board_surface.set_colourkey((0,0,0)) #background is black
         for row in self.board_values:
             x = 0 #reset x position each row
@@ -88,6 +96,39 @@ class Board():
                 x = x+1
 
             y = y+1 #moving down to the next row
+
+    #render the player characters on top of the static board
+    def render_players(self):
+        #loop through the player map to find which player is in which tile
+        x = 0
+        y = 0
+        for row in self.player_map:
+            x = 0 #reset x position after each row
+            for player_text in row:
+                x_position = x*self.tile_size
+                y_position = y*self.tile_size
+                x = x+1 #update the column, this is earlier due to potential use of continue later
+                #get the relevant image for each player
+                if player_text=='mustard':
+                    image = self.dynamic_sprites.mustard
+                elif player_text=='scarlet':
+                    image = self.dynamic_sprites.scarlet
+                elif player_text=='plum':
+                    image = self.dynamic_sprites.plum
+                elif player_text=='peacock':
+                    image = self.dynamic_sprites.peacock
+                elif player_text=='rev_green':
+                    image = self.dynamic_sprites.rev_green
+                elif player_text=='white':
+                    image = self.dynamic_sprites.white
+                else:
+                    continue #we do not need to render an image
+                self.board_surface.blit(image,(x_position,y_position))
+                
+            y = y+1 #update the row
+
+
+
 
     #create the map of players at their starting positions
     def create_players_at_start(self):
@@ -190,7 +231,7 @@ class GameMaster():
     #display the contents of the screen on the display
     def display_render(self):
         #project UI elements on the screen
-        self.screen.blit(self.board.static_board_surface,(self.other_player_width_pixels,0)) #project the board onto the screen
+        self.screen.blit(self.board.board_surface,(self.other_player_width_pixels,0)) #project the board onto the screen
         #project the screen onto the final display accounting for dynamic resizing
         if self.display_resized_flag==False:
             self.display.blit(self.screen, (0, 0))
