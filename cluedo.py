@@ -8,6 +8,7 @@ import numpy as np #for storing the state of the board
 import pygame
 import pygame.locals
 import sys
+import random
 import os
 
 #constants
@@ -39,23 +40,43 @@ class PlayerBoardSprites():
 
 class PlayerDisplaySprites():
     def __init__(self):
-        #for display in the info screens, these will be 86 by 86
-        self.mustard = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(86,86))
-        self.scarlet = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(86,86))
-        self.peacock = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(86,86))
-        self.rev_green = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(86,86))
-        self.plum = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(86,86))
-        self.white = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(86,86))
+        #for display in the info screens, these will be 67 by 67
+        self.mustard = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
+        self.scarlet = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
+        self.peacock = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
+        self.rev_green = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
+        self.plum = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
+        self.white = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
 
 #sprites of the cards
 class CardSprites():
     def __init__(self):
-        #these will be 86 by 86
-        self.question = pygame.image.load("cluedo_images/question.png")
-        self.question = pygame.image.load("")
-
+        #these will be 67 by 67
+        self.question = pygame.image.load("cluedo_images/question.png") #unknown card
+        #player cards
+        self.mustard = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
+        self.scarlet = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
+        self.peacock = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
+        self.rev_green = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
+        self.plum = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
+        self.white = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
+        #room cards
+        self.billards = pygame.image.load("cluedo_images/question.png")
+        self.conservatory = pygame.image.load("cluedo_images/question.png")
+        self.ballroom = pygame.image.load("cluedo_images/question.png")
+        self.kitchen = pygame.image.load("cluedo_images/question.png")
+        self.lounge = pygame.image.load("cluedo_images/question.png")
+        self.study = pygame.image.load("cluedo_images/question.png")
+        self.hall = pygame.image.load("cluedo_images/question.png")
+        self.dining_room = pygame.image.load("cluedo_images/question.png")
+        self.library = pygame.image.load("cluedo_images/question.png")
+        #weapon cards
+        self.spanner = pygame.image.load("cluedo_images/question.png")
+        self.rope = pygame.image.load("cluedo_images/question.png")
+        self.dagger = pygame.image.load("cluedo_images/question.png")
+        self.lead_piping = pygame.image.load("cluedo_images/question.png")
+        self.candlestick = pygame.image.load("cluedo_images/question.png")
         
-
 
 #cludeo is played on a 27 tile wide,25 tile tall board
 class Board():
@@ -276,16 +297,109 @@ class Board():
         tile_type = tiles[tile_value]
         return tile_type
 
+
+#controls the logic for the displayed player
+class OwnPlayer():
+    def __init__(self,debug):
+        self.debug = debug #are we in debug mode
+
+#controls the state of cards in the game
+class CardController():
+    #create the list of cards and decide on the murder cards
+    def __init__(self):
+        self.room_cards : list[str] = ["billards","kitchen","lounge","library","hall","study","ballroom","dining_room","conservatory"]
+        self.weapon_cards : list[str] = ["spanner","rope","dagger","lead_piping","candlestick"]
+        self.player_cards : list[str] = ["mustard","scarlet","peacock","rev_green","plum","white"]
+        self.calculate_murder_cards()
+        self.players : list[str] = ['mustard','scarlet','peacock','rev_green','plum','white'] #list of all valid players
+        self.num_players : int = len(self.players)
+
+
+    def calculate_murder_cards(self):
+        #how many cards of each type
+        num_room_cards : int = len(self.room_cards)
+        num_weapon_cards : int = len(self.weapon_cards)
+        num_player_cards : int = len(self.player_cards)
+        #get the murder card index for each room
+        room_card_num : int = random.randin(0,num_room_cards-1)
+        weapon_card_num : int = random.randin(0,num_weapon_cards-1)
+        player_card_num : int = random.randin(0,num_player_cards-1)
+        #extract each murder card and remove it from the list of free cards
+        self.murder_room : str = self.room_cards[room_card_num]
+        del self.room_cards[room_card_num]
+        self.murder_weapon : str = self.weapon_cards[weapon_card_num]
+        del self.weapon_cards[weapon_card_num]
+        self.murder_player : str = self.player_cards[player_card_num]
+        del self.player_cards[player_card_num]
+        self.all_cards_left : list[str] = self.room_cards + self.weapon_cards + self.murder_cards
+
+    def assign_cards_to_players(self,player_list : list[str]):
+        #note player list is in order
+        #lists to store which cards players own
+        self.player_cards : list[list[str]] = [[],[],[],[],[],[]]
+        #is each player playing
+        self.player_playing : list[bool] = [False,False,False,False,False,False]
+        num_playing :int = 0
+        for player in player_list:
+            num_playing = num_playing + 1
+            valid_player : bool = False
+            for i in range(self.num_players):
+                if self.players[i]==player:
+                    self.player_playing[i] = True
+                    valid_player = True
+                    break
+                else:
+                    continue
+            if valid_player==False:
+                print("WARNING: INVALID PLAYER ",player," DETECTED")
+                #invalid players cannot play no matter what
+                num_playing = num_playing - 1 #so reverse increment of number of players
+        
+        #now it is time to distribute the cards
+        num_cards_left : int = len(self.all_cards_left)
+        player_to_deal : int = 0 #which player are we dealing at
+        while(num_cards_left>0): #while there are cards left to be dealed
+            card_dealt : bool = False #has a card been dealt yet
+            loops : int = 0
+            while card_dealt==False: #if there are no valid players this may get trapped in an infinite loop
+                if self.player_playing[player_to_deal]==True:
+                    card_dealt = True
+                else:
+                    player_to_deal = player_to_deal + 1
+                    if player_to_deal==6:
+                        loops = loops + 1
+                        player_to_deal = 0
+                    if loops>=2:
+                        print("INFINITE LOOP DETECTED DURING DEALING")
+            new_card_index : int = random.randint(0,num_cards_left-1) #extract random card from the remaining cards
+            new_card : str = self.all_cards_left[new_card_index]
+            del self.all_cards_left[new_card_index] #remove the card from the pile
+            self.player_cards[player_to_deal].append(new_card) #add it to the list of cards each player has
+            player_to_deal = player_to_deal + 1 #next player to deal
+            if player_to_deal==6: #reset player counter once we reach the max number of players
+                player_to_deal = 0
+            num_cards_left = num_cards_left-1 #we have 1 less card on the pile now it has been dealt
+
+
+                
+
+            
+
+
+        
+
+
+
 #controls the overall flow of the game logic
 class GameMaster():
     def __init__(self,board_path='board.csv',tile_list=tiles):
         self.debug = True #change to false once we have finished development
         board_values,board_size =  self.extract_board_data(board_path,tiles)
-        board_height = board_size[0] #height of the board in tiles, normally be 832
-        board_width = board_size[1] #width of the board in tiles, normally be 864
+        board_height = board_size[0] #height of the board in tiles, should be 26
+        board_width = board_size[1] #width of the board in tiles, should be 27
         self.tile_size = 32 #number of pixels in a tile
-        self.board_height_pixels = board_height*self.tile_size #height of the playing board in pixels
-        self.board_width_pixels = board_height*self.tile_size #width of the playing board in pixels
+        self.board_height_pixels = board_height*self.tile_size #height of the playing board in pixels, should be 832
+        self.board_width_pixels = board_height*self.tile_size #width of the playing board in pixels, should be 864
         self.other_player_width_pixels = 172 #width of the left sidebar, where players and their cards are displayed
         self.self_player_width_pixels = 172 #width of the right sidebar, where your own cards and controls are displayed
         self.screen_default_width = self.board_width_pixels + self.other_player_width_pixels + self.self_player_width_pixels #total width, pixels,s of the screen
