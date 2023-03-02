@@ -10,95 +10,96 @@ import pygame.locals
 import sys
 import random
 import os
+import typing
 
 #constants
 #list of all static objects
-tiles = ['wall','walk','kitchen','dining_room','lounge','hall','study','library','billards','conservatory','ballroom','start_mustard',
+tiles : list[str] = ['wall','walk','kitchen','dining_room','lounge','hall','study','library','billards','conservatory','ballroom','start_mustard',
 'start_scarlet','start_plum','start_peacock','start_rev_green','start_white','secret_study','secret_lounge','secret_conservatory','secret_kitchen',
 'centre']
 #list of all players
-players = ['mustard','scarlet','plum','peacock','rev_green','white']
+players : list[str] = ['mustard','scarlet','plum','peacock','rev_green','white']
 
 #load the static sprites we are using in this game
 class StaticSprites():
     def __init__(self):
-        self.walk = pygame.image.load("cluedo_images/walk.png")
-        self.centre = pygame.image.load("cluedo_images/centre.png")
-        self.wall = pygame.image.load("cluedo_images/wall.png")
-        self.space = pygame.image.load("cluedo_images/space.png")
-        self.secret = pygame.image.load("cluedo_images/secret.png")
+        self.walk : pygame.Surface = pygame.image.load("cluedo_images/walk.png")
+        self.centre : pygame.Surface = pygame.image.load("cluedo_images/centre.png")
+        self.wall : pygame.Surface = pygame.image.load("cluedo_images/wall.png")
+        self.space : pygame.Surface = pygame.image.load("cluedo_images/space.png")
+        self.secret : pygame.Surface = pygame.image.load("cluedo_images/secret.png")
 
 #load the sprites of the players
 class PlayerBoardSprites():
     def __init__(self):
-        self.mustard = pygame.image.load("cluedo_images/mustard.png").convert_alpha()
-        self.scarlet = pygame.image.load("cluedo_images/scarlet.png").convert_alpha()
-        self.peacock = pygame.image.load("cluedo_images/peacock.png").convert_alpha()
-        self.rev_green = pygame.image.load("cluedo_images/rev_green.png").convert_alpha()
-        self.plum = pygame.image.load("cluedo_images/plum.png").convert_alpha()
-        self.white = pygame.image.load("cluedo_images/white.png").convert_alpha()
+        self.mustard : pygame.Surface = pygame.image.load("cluedo_images/mustard.png").convert_alpha()
+        self.scarlet : pygame.Surface = pygame.image.load("cluedo_images/scarlet.png").convert_alpha()
+        self.peacock : pygame.Surface = pygame.image.load("cluedo_images/peacock.png").convert_alpha()
+        self.rev_green : pygame.Surface = pygame.image.load("cluedo_images/rev_green.png").convert_alpha()
+        self.plum : pygame.Surface = pygame.image.load("cluedo_images/plum.png").convert_alpha()
+        self.white : pygame.Surface = pygame.image.load("cluedo_images/white.png").convert_alpha()
 
 class PlayerDisplaySprites():
     def __init__(self):
         #for display in the info screens, these will be 67 by 67
-        self.mustard = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
-        self.scarlet = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
-        self.peacock = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
-        self.rev_green = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
-        self.plum = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
-        self.white = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
+        self.mustard : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
+        self.scarlet : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
+        self.peacock : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
+        self.rev_green : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
+        self.plum : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
+        self.white : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
 
 #sprites of the cards
 class CardSprites():
     def __init__(self):
         #these will be 67 by 67
-        self.question = pygame.image.load("cluedo_images/question.png") #unknown card
+        self.question : pygame.Surface = pygame.image.load("cluedo_images/question.png") #unknown card
         #player cards
-        self.mustard = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
-        self.scarlet = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
-        self.peacock = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
-        self.rev_green = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
-        self.plum = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
-        self.white = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
+        self.mustard : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/mustard.png").convert_alpha(),(67,67))
+        self.scarlet : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/scarlet.png").convert_alpha(),(67,67))
+        self.peacock : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/peacock.png").convert_alpha(),(67,67))
+        self.rev_green : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/rev_green.png").convert_alpha(),(67,67))
+        self.plum : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/plum.png").convert_alpha(),(67,67))
+        self.white : pygame.Surface = pygame.transform(pygame.image.load("cluedo_images/white.png").convert_alpha(),(67,67))
         #room cards
-        self.billards = pygame.image.load("cluedo_images/question.png")
-        self.conservatory = pygame.image.load("cluedo_images/question.png")
-        self.ballroom = pygame.image.load("cluedo_images/question.png")
-        self.kitchen = pygame.image.load("cluedo_images/question.png")
-        self.lounge = pygame.image.load("cluedo_images/question.png")
-        self.study = pygame.image.load("cluedo_images/question.png")
-        self.hall = pygame.image.load("cluedo_images/question.png")
-        self.dining_room = pygame.image.load("cluedo_images/question.png")
-        self.library = pygame.image.load("cluedo_images/question.png")
+        self.billards : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.conservatory : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.ballroom : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.kitchen : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.lounge : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.study : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.hall : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.dining_room : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.library : pygame.Surface = pygame.image.load("cluedo_images/question.png")
         #weapon cards
-        self.spanner = pygame.image.load("cluedo_images/question.png")
-        self.rope = pygame.image.load("cluedo_images/question.png")
-        self.dagger = pygame.image.load("cluedo_images/question.png")
-        self.lead_piping = pygame.image.load("cluedo_images/question.png")
-        self.candlestick = pygame.image.load("cluedo_images/question.png")
+        self.spanner : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.rope : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.dagger : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.lead_piping : pygame.Surface = pygame.image.load("cluedo_images/question.png")
+        self.candlestick : pygame.Surface = pygame.image.load("cluedo_images/question.png")
         
 
 #cludeo is played on a 27 tile wide,25 tile tall board
 class Board():
     #create the board on which the game will be played
-    def __init__(self,board_values,board_width,board_height,tile_size,debug):
-        self.name = 'board' #name of the object, for debugging purposes
+    def __init__(self,board_values : list[list[int]],board_width : int,board_height : int,tile_size : int,debug : bool):
+        self.name : str = 'board' #name of the object, for debugging purposes
         self.board_values = board_values #numbers what type of static object each position holds
-        self.board_width = board_width
-        self.board_height = board_height
-        self.tile_size = tile_size
-        self.board_pixel_width = self.tile_size*self.board_width #determine the default width in pixels of the board
-        self.board_pixel_height = self.tile_size*self.board_height #determine the default height in pixels of the board
-        self.debug = debug
+        self.board_width : int  = board_width
+        self.board_height : int = board_height
+        self.tile_size : int = tile_size
+        self.board_pixel_width : int = self.tile_size*self.board_width #determine the default width in pixels of the board
+        self.board_pixel_height : int = self.tile_size*self.board_height #determine the default height in pixels of the board
+        self.debug : bool = debug
         self.create_players_at_start()
         self.setup_rendering()
         self.render_board()
     
     #create the objects involved in rendering the board, and render the static background
     def setup_rendering(self):
-        self.board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
-        self.static_sprites = StaticSprites() #load the static sprites used in the game
-        self.dynamic_sprites = PlayerBoardSprites() #load the dynamic sprites used in the game
+        self.board_surface : pygame.Surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size
+        self.static_sprites : StaticSprites = StaticSprites() #load the static sprites used in the game
+        self.dynamic_sprites : PlayerBoardSprites = PlayerBoardSprites() #load the dynamic sprites used in the game
         self.render_background() #create the background
         
     #render the current board        
@@ -108,24 +109,24 @@ class Board():
 
     #render the background of the board
     def render_background(self):
-        self.static_board_surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size to be the background
+        self.static_board_surface : pygame.Surface = pygame.Surface((self.board_pixel_width,self.board_pixel_height)) #create a surface of the correct size to be the background
         self.render_static_tiles() #render the tiles on the board
         self.render_room_text() #render the text on the board
 
     #render the text displayed on the rooms
     def render_room_text(self):
-        font = pygame.font.SysFont(None,24)
-        black = pygame.Color(0,0,0)
+        font : pygame.font = pygame.font.SysFont(None,24)
+        black : pygame.Color = pygame.Color(0,0,0)
         #generate text for each room
-        billards_room_text = font.render('Billiards Room',True,black)
-        kitchen_text = font.render('Kitchen',True,black)
-        lounge_text = font.render('Lounge',True,black)
-        library_text = font.render('Library',True,black)
-        hall_text = font.render('Hall',True,black)
-        study_text = font.render('Study',True,black)
-        ballroom_text = font.render('Ballroom',True,black)
-        dining_room_text = font.render('Dining Room',True,black)
-        conservatory_text = font.render('Conservatory',True,black)
+        billards_room_text : pygame.Surface = font.render('Billiards Room',True,black)
+        kitchen_text : pygame.Surface = font.render('Kitchen',True,black)
+        lounge_text : pygame.Surface = font.render('Lounge',True,black)
+        library_text : pygame.Surface = font.render('Library',True,black)
+        hall_text : pygame.Surface = font.render('Hall',True,black)
+        study_text : pygame.Surface = font.render('Study',True,black)
+        ballroom_text : pygame.Surface = font.render('Ballroom',True,black)
+        dining_room_text : pygame.Surface = font.render('Dining Room',True,black)
+        conservatory_text : pygame.Surface = font.render('Conservatory',True,black)
         #now let's render each text at the centre of the respective room
         self.render_at_centre(billards_room_text,black,'billards')
         self.render_at_centre(kitchen_text,black,'kitchen')
@@ -140,25 +141,27 @@ class Board():
 
 
     #render text at the centre of a room, by which we mean the midpoint between the extremes
-    def render_at_centre(self,text,colour,room_name):
+    def render_at_centre(self,text : pygame.Surface,colour : pygame.Color,room_name : str):
         centre_x,centre_y = self.find_room_centre(room_name)
         if self.debug==True:
             print('room = ',room_name,' centre x = ',centre_x,' centre y = ',centre_y)
-        text_width = text.get_width()
-        text_height = text.get_height()
-        offset_x = int(text_width/2)
-        offset_y = int(text_height/2)
+        text_width : int = text.get_width()
+        text_height : int  = text.get_height()
+        offset_x : int = int(text_width/2)
+        offset_y : int = int(text_height/2)
         self.static_board_surface.blit(text,(centre_x-offset_x,centre_y-offset_y))
         
 
     #find the pixel coordinates at the centre of a room
-    def find_room_centre(self,room_name):    
-        min_x = self.board_width
-        min_y = self.board_height
-        max_x = -1
-        max_y = -1
-        scan_x = 0
-        scan_y = 0
+    def find_room_centre(self,room_name : str):    
+        min_x : int = self.board_width
+        min_y : int = self.board_height
+        max_x : int = -1
+        max_y : int = -1
+        scan_x : int = 0
+        scan_y : int = 0
+        centre_x : int = -1
+        centre_y : int = -1
         #go through all the tiles in the board
         for row in self.board_values:
             scan_x = 0
@@ -186,34 +189,34 @@ class Board():
             centre_y = -1    
         else:
             #calculate the central pixel of the room
-            centre_x = ((min_x+max_x+1)/2)*self.tile_size
-            centre_y = ((min_y+max_y+1)/2)*self.tile_size
+            centre_x = int(((min_x+max_x+1)/2)*self.tile_size)
+            centre_y = int(((min_y+max_y+1)/2)*self.tile_size)
 
         return centre_x,centre_y
 
     #render the static tiles that make up the board
     def render_static_tiles(self):
-        x = 0 #position of current tile in the board along the x-axis
-        y = 0 #position of current tile in the board along the y-axis
+        x : int = 0 #position of current tile in the board along the x-axis
+        y : int = 0 #position of current tile in the board along the y-axis
         
         #self.static_board_surface.set_colourkey((0,0,0)) #background is black
         for row in self.board_values:
             x = 0 #reset x position each row
             for tile in row:
-                x_position = x*self.tile_size
-                y_position = y*self.tile_size
-                tile_text = tiles[int(tile)] #get the text of the tile
+                x_position : int = x*self.tile_size
+                y_position : int = y*self.tile_size
+                tile_text : str = tiles[int(tile)] #get the text of the tile
                 #select image based on what type of tile we are using
                 if tile_text=='wall':
-                    image = self.static_sprites.wall
+                    image : pygame.Surface = self.static_sprites.wall
                 elif tile_text=='walk' or tile_text=='start_mustard' or tile_text=='start_scarlet' or tile_text=='start_plum' or tile_text=='start_peacock' or tile_text=='start_rev_green' or tile_text=='start_white':
-                    image = self.static_sprites.walk
+                    image : pygame.Surface = self.static_sprites.walk
                 elif tile_text=='centre':
-                    image = self.static_sprites.centre
+                    image : pygame.Surface = self.static_sprites.centre
                 elif tile_text=='secret_study' or tile_text=='secret_lounge' or tile_text=='secret_conservatory' or tile_text=='secret_kitchen':
-                    image = self.static_sprites.secret
+                    image : pygame.Surface = self.static_sprites.secret
                 else:
-                    image = self.static_sprites.space
+                    image : pygame.Surface = self.static_sprites.space
                 #render the image in the correct position
                 #rect = image.get_rect() #extract the rect object from the image
                 #
@@ -225,27 +228,27 @@ class Board():
     #render the player characters on top of the static board
     def render_players(self):
         #loop through the player map to find which player is in which tile
-        x = 0
-        y = 0
+        x : int = 0
+        y : int = 0
         for row in self.player_map:
             x = 0 #reset x position after each row
             for player_text in row:
-                x_position = x*self.tile_size
-                y_position = y*self.tile_size
+                x_position : int = x*self.tile_size
+                y_position : int = y*self.tile_size
                 x = x+1 #update the column, this is earlier due to potential use of continue later
                 #get the relevant image for each player
                 if player_text=='mustard':
-                    image = self.dynamic_sprites.mustard
+                    image : pygame.Surface = self.dynamic_sprites.mustard
                 elif player_text=='scarlet':
-                    image = self.dynamic_sprites.scarlet
+                    image : pygame.Surface  = self.dynamic_sprites.scarlet
                 elif player_text=='plum':
-                    image = self.dynamic_sprites.plum
+                    image : pygame.Surface  = self.dynamic_sprites.plum
                 elif player_text=='peacock':
-                    image = self.dynamic_sprites.peacock
+                    image : pygame.Surface  = self.dynamic_sprites.peacock
                 elif player_text=='rev_green':
-                    image = self.dynamic_sprites.rev_green
+                    image : pygame.Surface  = self.dynamic_sprites.rev_green
                 elif player_text=='white':
-                    image = self.dynamic_sprites.white
+                    image : pygame.Surface  = self.dynamic_sprites.white
                 else:
                     continue #we do not need to render an image
                 self.board_surface.blit(image,(x_position,y_position))
@@ -254,54 +257,54 @@ class Board():
 
     #create the map of players at their starting positions
     def create_players_at_start(self):
-        self.player_map = []
+        self.player_map : list[list[str]] = []
         for row in self.board_values:
-            new_row = []
+            new_row : list[str] = []
             for tile in row:
-                tile_text = tiles[tile] #get the text of the tile
+                tile_text : str = tiles[tile] #get the text of the tile
                 if tile_text=='start_mustard':
-                    player='mustard'
+                    player : str = 'mustard'
                 elif tile_text=='start_scarlet':
-                    player='scarlet'
+                    player : str = 'scarlet'
                 elif tile_text=='start_plum':
-                    player='plum'
+                    player : str = 'plum'
                 elif tile_text=='start_peacock':
-                    player='peacock'
+                    player : str = 'peacock'
                 elif tile_text=='start_rev_green':
-                    player='rev_green'
+                    player : str = 'rev_green'
                 elif tile_text=='start_white':
-                    player='white'
+                    player : str = 'white'
                 else:
-                    player=' ' #placeholder
+                    player : str = ' ' #placeholder
                 new_row.append(player)
             self.player_map.append(new_row)
                 
-    def mouse_down(self,x,y,debug):
+    def mouse_down(self,x : int,y : int,debug : bool):
         tile_x,tile_y = self.pixel_position_to_tile(x,y) #determine the position of the clicked on tile
         if debug==True:
             print('tile x = ',tile_x,' tile y =',tile_y)
-        tile_type = self.extract_tile_type(tile_x,tile_y) #determine the type of tile we clicked on
+        tile_type : str = self.extract_tile_type(tile_x,tile_y) #determine the type of tile we clicked on
         if debug==True:
             print('this is a ',tile_type,' tile')
         
     
     #convert pixel position on the board to tile position
-    def pixel_position_to_tile(self,x,y):
-        tile_position_x = int(x/self.tile_size)
-        tile_position_y = int(y/self.tile_size)
+    def pixel_position_to_tile(self,x : int,y : int):
+        tile_position_x : int = int(x/self.tile_size)
+        tile_position_y : int = int(y/self.tile_size)
         return tile_position_x,tile_position_y
 
     #provide the type of tile at a particular position
-    def extract_tile_type(self,tile_x,tile_y):
-        tile_value = self.board_values[tile_y,tile_x]
-        tile_type = tiles[tile_value]
+    def extract_tile_type(self,tile_x : int,tile_y : int):
+        tile_value : int = self.board_values[tile_y,tile_x]
+        tile_type : str = tiles[tile_value]
         return tile_type
 
 
 #controls the logic for the displayed player
 class OwnPlayer():
     def __init__(self,debug):
-        self.debug = debug #are we in debug mode
+        self.debug : bool = debug #are we in debug mode
 
 #controls the state of cards in the game
 class CardController():
@@ -309,7 +312,7 @@ class CardController():
     def __init__(self):
         self.room_cards : list[str] = ["billards","kitchen","lounge","library","hall","study","ballroom","dining_room","conservatory"]
         self.weapon_cards : list[str] = ["spanner","rope","dagger","lead_piping","candlestick"]
-        self.player_cards : list[str] = ["mustard","scarlet","peacock","rev_green","plum","white"]
+        self.player_rep_cards : list[str] = ["mustard","scarlet","peacock","rev_green","plum","white"]
         self.calculate_murder_cards()
         self.players : list[str] = ['mustard','scarlet','peacock','rev_green','plum','white'] #list of all valid players
         self.num_players : int = len(self.players)
@@ -319,7 +322,7 @@ class CardController():
         #how many cards of each type
         num_room_cards : int = len(self.room_cards)
         num_weapon_cards : int = len(self.weapon_cards)
-        num_player_cards : int = len(self.player_cards)
+        num_player_cards : int = len(self.player_rep_cards)
         #get the murder card index for each room
         room_card_num : int = random.randint(0,num_room_cards-1)
         weapon_card_num : int = random.randint(0,num_weapon_cards-1)
@@ -329,9 +332,9 @@ class CardController():
         del self.room_cards[room_card_num]
         self.murder_weapon : str = self.weapon_cards[weapon_card_num]
         del self.weapon_cards[weapon_card_num]
-        self.murder_player : str = self.player_cards[player_card_num]
-        del self.player_cards[player_card_num]
-        self.all_cards_left : list[str] = self.room_cards + self.weapon_cards + self.player_cards
+        self.murder_player : str = self.player_rep_cards[player_card_num]
+        del self.player_rep_cards[player_card_num]
+        self.all_cards_left : list[str] = self.room_cards + self.weapon_cards + self.player_rep_cards
 
     def assign_cards_to_players(self,player_list : list[str]):
         #note player list is in order
@@ -383,23 +386,23 @@ class CardController():
 
 #controls the overall flow of the game logic
 class GameMaster():
-    def __init__(self,board_path='board.csv'):
-        self.debug = True #change to false once we have finished development
+    def __init__(self,board_path : str ='board.csv'):
+        self.debug : bool = True #change to false once we have finished development
         board_values,board_size =  self.extract_board_data(board_path,tiles)
-        board_height = board_size[0] #height of the board in tiles, should be 26
-        board_width = board_size[1] #width of the board in tiles, should be 27
-        self.tile_size = 32 #number of pixels in a tile
-        self.board_height_pixels = board_height*self.tile_size #height of the playing board in pixels, should be 832
-        self.board_width_pixels = board_height*self.tile_size #width of the playing board in pixels, should be 864
-        self.other_player_width_pixels = 172 #width of the left sidebar, where players and their cards are displayed
-        self.self_player_width_pixels = 172 #width of the right sidebar, where your own cards and controls are displayed
-        self.screen_default_width = self.board_width_pixels + self.other_player_width_pixels + self.self_player_width_pixels #total width, pixels,s of the screen
-        self.screen_default_height = self.board_height_pixels #total height, pixels, of the screen
-        self.display = pygame.display.set_mode((self.screen_default_width,self.screen_default_height),pygame.RESIZABLE) #create the display on which the screen is projected
-        self.display_resized_flag = False #the display has not yet been resized
-        self.display_width = self.screen_default_width #display width
-        self.display_height = self.screen_default_height #display height
-        self.screen =  pygame.Surface((self.screen_default_width,self.screen_default_height)) #screen object on which UI elements are project
+        board_height : int = board_size[0] #height of the board in tiles, should be 26
+        board_width : int = board_size[1] #width of the board in tiles, should be 27
+        self.tile_size : int = 32 #number of pixels in a tile
+        self.board_height_pixels : int  = board_height*self.tile_size #height of the playing board in pixels, should be 832
+        self.board_width_pixels : int = board_height*self.tile_size #width of the playing board in pixels, should be 864
+        self.other_player_width_pixels : int = 172 #width of the left sidebar, where players and their cards are displayed
+        self.self_player_width_pixels : int = 172 #width of the right sidebar, where your own cards and controls are displayed
+        self.screen_default_width : int = self.board_width_pixels + self.other_player_width_pixels + self.self_player_width_pixels #total width, pixels,s of the screen
+        self.screen_default_height : int = self.board_height_pixels #total height, pixels, of the screen
+        self.display : pygame.Surface = pygame.display.set_mode((self.screen_default_width,self.screen_default_height),pygame.RESIZABLE) #create the display on which the screen is projected
+        self.display_resized_flag : bool = False #the display has not yet been resized
+        self.display_width : int = self.screen_default_width #display width
+        self.display_height : int = self.screen_default_height #display height
+        self.screen : pygame.Surface =  pygame.Surface((self.screen_default_width,self.screen_default_height)) #screen object on which UI elements are project
         #create the board object
         self.board : Board = Board(board_values,board_height,board_width,self.tile_size,self.debug) #create the board object
         self.card_controller : CardController = CardController()
@@ -421,16 +424,16 @@ class GameMaster():
                 self.mouse_down(event)
 
     #resize the screen
-    def display_resize(self,new_size):
+    def display_resize(self,new_size : list[int]):
         self.display_resized_flag = True #indicate the display has been resized
-        self.new_size = new_size #store the new size of the display
+        self.new_size : list[int] = new_size #store the new size of the display
         self.display_width = new_size[0] #update display width
         self.display_height = new_size[1] #update display height
 
-    def screen_mouse_position(self,x,y):
+    def screen_mouse_position(self,x : int,y : int):
         #convert mouse position between display coordinates and screen coordinates
-        screen_x = x*(self.screen_default_width/self.display_width) #position on the screen
-        screen_y = y*(self.screen_default_height/self.display_height) #position on the screen
+        screen_x : int = int(x*(self.screen_default_width/self.display_width)) #position on the screen
+        screen_y : int = int(y*(self.screen_default_height/self.display_height)) #position on the screen
         return screen_x,screen_y
 
 
@@ -445,20 +448,23 @@ class GameMaster():
             self.display.blit(pygame.transform.scale(self.screen,self.new_size),(0,0))
 
     #extract info about the board
-    def extract_board_data(self,board_path,tiles):
-        board_raw = pandas.read_csv(board_path,header=None) #extract raw data from the csv file
-        board_size = board_raw.shape #get the dimensions of the board
-        board_values = np.zeros(board_size)#the board represented as a numpy array, the numbers represent what type of tile occupies each grid-square
+    def extract_board_data(self,board_path : str,tiles : list[str]):
+        board_raw : pandas.DataFrame = pandas.read_csv(board_path,header=None) #extract raw data from the csv file
+        board_size : tuple[int,int] = board_raw.shape #get the dimensions of the board
+        board_values : np.ndarray = np.zeros(board_size)#the board represented as a numpy array, the numbers represent what type of tile occupies each grid-square
         for i,tile_name in enumerate(tiles): #go through all the types of tiles
-            truth = board_raw==tile_name #find the tiles which are the current type of tile
+            truth : bool = board_raw==tile_name #find the tiles which are the current type of tile
             board_values = board_values + truth*i #set the tile number accordingly
 
         board_values = np.array(board_values,dtype=int) #convert back to a numpy array of ints
         return board_values,board_size #provide the numeric representation of the boards tiles
 
     #return the object at the referenced position on the screen
-    def return_object_at_position(self,screen_x,screen_y):
+    def return_object_at_position(self,screen_x : int,screen_y : int):
         #if player clicks on the playing board
+        object_x : int = -1
+        object_y : int = -1
+        object_clicked : typing.Any = -1
         if screen_x>=self.other_player_width_pixels and screen_x<self.other_player_width_pixels+self.board_width_pixels:
             if self.debug==True:
                 print('clicked on board')
@@ -470,7 +476,7 @@ class GameMaster():
         elif screen_x<self.other_player_width_pixels:
             if self.debug==True:
                 print('clicked on other players region')
-            object_x = screen_x
+            object_x  = screen_x
             object_y = screen_y
             object_clicked = 0 #self.other_players_region #will be zero till implementation
         #if player clicks on info about themsleves
@@ -509,11 +515,11 @@ class GameMaster():
         
 def main():
     pygame.init()  # initialize pygame
-    clock = pygame.time.Clock() #create a clock to set the frame-rate
+    clock : pygame.time.Clock = pygame.time.Clock() #create a clock to set the frame-rate
     pygame.display.set_caption('Cluedo') #display the game title in the window
     #board = Board("board.csv") #create the board
     #print(board.board_static)
-    gm = GameMaster()
+    gm : GameMaster = GameMaster()
     printed : bool = False #debug
     while True:
         clock.tick(60)
